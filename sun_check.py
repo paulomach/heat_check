@@ -14,7 +14,14 @@ def getWeather():
 
 
 def processWeather(temp, cover):
-    if temp > 28 or cover < 0.55:
+    if cover >= 0.9:
+        cmd = 'enabletimer'
+    elif temp <= 27:
+        if cover < 0.5:
+            cmd = 'disabletimer'
+        else:
+            cmd = 'enabletimer'
+    elif temp > 27:
         cmd = 'disabletimer'
     else:
         cmd = 'enabletimer'
@@ -23,7 +30,7 @@ def processWeather(temp, cover):
 
 def logCommand(cmd, temp, cover):
     from os import system
-    log_str = '- Timer On -' if cmd == 'enabletimer' else '- Timer Off -'
+    log_str = ' - Timer On  -' if cmd == 'enabletimer' else ' - Timer Off -'
     log_str = now() + log_str + ' Temp: ' + str(temp) + 'C' + ' - Cloud Cover: ' + str(100 * cover) + '%'
     system('echo ' + log_str + ' >> /var/log/sun_check.log')
     print(log_str)
