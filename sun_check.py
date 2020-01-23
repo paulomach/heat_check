@@ -14,14 +14,14 @@ def getWeather():
 
 
 def processWeather(temp, cover):
-    if cover >= 0.9:
+    if cover >= 0.9 or temp < 18.0:
         cmd = 'enabletimer'
-    elif temp <= 27:
+    elif temp <= 27.0:
         if cover < 0.5:
             cmd = 'disabletimer'
         else:
             cmd = 'enabletimer'
-    elif temp > 27:
+    elif temp > 27.0:
         cmd = 'disabletimer'
     else:
         cmd = 'enabletimer'
