@@ -3,10 +3,7 @@ def now():
     return (datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
 
-def getWeather():
-    latitude = '-23.513084722626527'
-    longitude = '-47.59298163469899'
-    api_key = '55d54b1934ab95c1b15b877dfa724442'
+def getWeather(latitude, longitude, api_key):
     from DarkSkyAPI.DarkSkyAPI import DarkSkyClient
     client = DarkSkyClient(api_key, (latitude, longitude), units='ca', exclude=['minutely', 'hourly'], lang='en')
     current_weather = client.get_current()
@@ -36,14 +33,23 @@ def logCommand(cmd, temp, cover):
     print(log_str)
 
 
-def processCommand(cmd):
+def processCommand(cmd, baseUrl, authKey):
     import requests
-    headers = {'Authorization': 'Basic cGF1bG86b3JsYW5kbzQ='}
-    requests.get(url='http://192.168.15.11:8080/json.htm?type=command&param=' + cmd + '&idx=3', headers=headers)
+    headers = {'Authorization': authKey}
+    requests.get(url=baseUrl + '/json.htm?type=command&param=' + cmd + '&idx=3', headers=headers)
 
 
 if __name__ == '__main__':
-    temp, cover = getWeather()
+    import json
+
+    with open('config.json', 'r') as config:
+        data = json.load(config)
+
+    temp, cover = getWeather(latitude=data.get('weather').get('lat'),
+                             longitude=data.get('weather').get('long'),
+                             api_key=data.get('weather').get('key'))
     cmd = processWeather(temp, cover)
-    processCommand(cmd)
+    processCommand(cmd=cmd,
+                   baseUrl=data.get('controller').get('baseUrl'),
+                   authKey=data.get('controller').get('authKey'))
     logCommand(cmd, temp, cover)
